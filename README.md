@@ -1,2 +1,599 @@
-# Diplomatic-Dashboard
-Diplomatic Activity Sofiene Dridi
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Diplomatique - Ambassade de Tunisie</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+        }
+
+        .logo p {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        /* Language Switcher */
+        .lang-switch {
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.2);
+            padding: 0.3rem;
+            border-radius: 30px;
+        }
+
+        .lang-btn {
+            padding: 0.5rem 1.2rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            background: transparent;
+            color: white;
+        }
+
+        .lang-btn.active {
+            background: white;
+            color: #1e3c72;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Tabs - CLAIR ET CLIQUABLE */
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .tab-btn {
+            padding: 0.8rem 1.5rem;
+            background: #e9ecef;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            color: #495057;
+        }
+
+        .tab-btn:hover {
+            background: #dee2e6;
+            transform: translateY(-2px);
+        }
+
+        .tab-btn.active {
+            background: #1e3c72;
+            color: white;
+        }
+
+        /* Filters */
+        .filters {
+            background: white;
+            padding: 1rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .filters input, .filters select {
+            padding: 0.6rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card h3 {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .stat-card .number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #1e3c72;
+        }
+
+        /* Table */
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            overflow-x: auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            color: #1e3c72;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        th:hover {
+            background: #e9ecef;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+
+        /* Status Badges */
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .status-completed { background: #d4edda; color: #155724; }
+        .status-progress { background: #fff3cd; color: #856404; }
+        .status-pending { background: #f8d7da; color: #721c24; }
+
+        /* Detail Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-content h3 {
+            color: #1e3c72;
+            margin-bottom: 1rem;
+        }
+
+        .modal-content p {
+            margin: 0.5rem 0;
+            line-height: 1.5;
+        }
+
+        .close-modal {
+            background: #dc3545;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            .tab-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <div class="header-content">
+        <div class="logo">
+            <h1 id="appTitle">📋 Dashboard Diplomatique</h1>
+            <p id="appSubtitle">Ambassade de Tunisie - Suivi des activités</p>
+        </div>
+        <div class="lang-switch">
+            <button class="lang-btn active" onclick="setLanguage('fr')">🇫🇷 Français</button>
+            <button class="lang-btn" onclick="setLanguage('en')">🇬🇧 English</button>
+            <button class="lang-btn" onclick="setLanguage('ar')">🇸🇦 العربية</button>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Tabs - CLAIQUABLES -->
+    <div class="tabs" id="tabsContainer"></div>
+
+    <!-- Filters -->
+    <div class="filters">
+        <input type="text" id="searchInput" placeholder="🔍 Rechercher..." onkeyup="filterData()">
+        <select id="countryFilter" onchange="filterData()">
+            <option value="">🌍 Tous les pays</option>
+        </select>
+        <select id="statusFilter" onchange="filterData()">
+            <option value="">📊 Tous les statuts</option>
+            <option value="completed">✅ Terminé</option>
+            <option value="progress">🔄 En cours</option>
+            <option value="pending">⏳ En attente</option>
+        </select>
+    </div>
+
+    <!-- Stats - CLAIQUABLES -->
+    <div class="stats" id="statsContainer"></div>
+
+    <!-- Table View -->
+    <div class="table-container">
+        <table id="dataTable">
+            <thead id="tableHeader"></thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Detail Modal -->
+<div id="detailModal" class="modal">
+    <div class="modal-content">
+        <h3 id="modalTitle">Détails de l'activité</h3>
+        <div id="modalBody"></div>
+        <button class="close-modal" onclick="closeModal()">Fermer</button>
+    </div>
+</div>
+
+<script>
+    // ==================== DONNÉES DE DÉMONSTRATION ====================
+    // Toutes ces lignes sont CLIQUABLES - remplacez par vos données Google Sheets plus tard
+    
+    const demoActivities = [
+        { id: 1, tab: "الرزنامة الدبلوماسية", date: "2026-03-22", title: "الإحتفال بعيد الاستقلال وعيد الفطر المبارك", country: "تونس", category: "أعياد وطنية ودينية", status: "completed", details: "الإحتفال بعيد الاستقلال وعيد الفطر المبارك بحضور أفراد الجالية. برقية سرية حول هذا النشاط. سيتم تضمين هذا النشاط في التقرير السنوي للبعثة." },
+        { id: 2, tab: "الرزنامة الدبلوماسية", date: "2026-03-23", dateEnd: "2026-03-24", title: "برنامج الأمم المتحدة للمستوطنات البشرية", country: "مجموعة شرق إفريقيا", category: "تظاهرات متعددة الأطراف", status: "progress", details: "الخلوة الدورية لسفراء المجموعة الإفريقية. مناقشة أهم الملفات والمواضيع الخاصة بنشاط البرنامج وتنسيق المواقف." },
+        { id: 3, tab: "الرزنامة الدبلوماسية", date: "2026-03-25", title: "الدبلوماسية الثقافية: شهر الفرنكوفونية", country: "كينيا", category: "تظاهرات وأنشطة ثقافية", status: "completed", details: "حفل موسيقي تونسي بمقر Alliance Française Nairobi لفرقة BENBOO. برقية بالبريد الالكتروني حول هذا النشاط." },
+        { id: 4, tab: "الرزنامة الدبلوماسية", date: "2026-04-20", title: "برنامج الأمم المتحدة للبيئة", country: "متعدد الأطراف", category: "تظاهرات متعددة الأطراف", status: "progress", details: "الدورة 173 للجنة الممثلين الدائمين لدى برنامج الأمم المتحدة للبيئة. المشاركة في هذه الدورة." },
+        { id: 5, tab: "الرزنامة الدبلوماسية", date: "2026-05-13", title: "زيارة وزير الشؤون الخارجية إلى كينيا", country: "كينيا", category: "استحقاقات ثنائية", status: "pending", details: "الدورة الأولى للمشاورات السياسية التونسية الكينية." },
+        { id: 6, tab: "القسم السياسي والإعلامي", date: "2026-01-07", title: "ردود أفعال بلدان الإعتماد حول اعتقال الرئيس الفينزويلي", country: "مجموعة شرق إفريقيا", category: "النشاط السياسي", status: "completed", details: "متابعة وتحليل السياسة الخارجية والعلاقات الثنائية والإقليمية. برقية سرية رقم 03." },
+        { id: 7, tab: "القسم السياسي والإعلامي", date: "2026-01-14", title: "أبرز نتائج زيارة وزير الخارجية الصيني لتنزانيا", country: "تنزانيا", category: "النشاط السياسي", status: "completed", details: "متابعة وتحليل السياسة الخارجية. برقية بالبريد الالكتروني رقم 04." },
+        { id: 8, tab: "القسم السياسي والإعلامي", date: "2026-01-19", title: "نتائج الانتخابات الرئاسية الأوغندية", country: "أوغندا", category: "النشاط السياسي", status: "completed", details: "متابعة وتحليل الأوضاع السياسية والأمنية. برقية سرية رقم 09." },
+        { id: 9, tab: "القسم السياسي والإعلامي", date: "2026-02-20", title: "الذكرى السنوية لجرائم الإبادة الجماعية برواندا", country: "رواندا", category: "النشاط السياسي", status: "progress", details: "متابعة وتحليل الأوضاع السياسية والأمنية. مذكرة شفوية صادرة عن مكتب الأمم المتحدة بنيروبي." },
+        { id: 10, tab: "الدبلوماسية العامة والتشريفات", date: "2026-01-05", title: "تقديم أوراق الإعتماد - المالاوي", country: "المالاوي", category: "المراسم والتشريفات", status: "completed", details: "طلب تحيين أوراق الإعتماد بإسم الرئيس الجديد للمالاوي. برقية سرية رقم 01." },
+        { id: 11, tab: "الدبلوماسية العامة والتشريفات", date: "2026-03-05", title: "إجتماع دبلوماسي مع وزارة الخارجية الكينية", country: "كينيا", category: "الدبلوماسية العامة", status: "completed", details: "دعوة من وزارة الخارجية والمغتربين الكينية لحضور إجتماع دبلوماسي. مذكرة شفوية عدد 633/2026." },
+        { id: 12, tab: "الدبلوماسية الإقتصادية والثقافي", date: "2026-02-05", title: "اليوم الترويجي للزيتون وزيت الزيتون التونسي", country: "كينيا", category: "الدبلوماسية الإقتصادية", status: "completed", details: "الدورة الثانية لتظاهرة اليوم الترويجي للزيتون. برقية سرية رقم 16." },
+        { id: 13, tab: "العمل متعدد الأطراف", date: "2026-03-23", title: "قمة إفريقيا فرنسا", country: "كينيا", category: "المنظمات والندوات الدولية", status: "progress", details: "قمة إفريقيا فرنسا: نيروبي، 11-12 ماي 2026. دعوة رسمية لسيادة رئيس الجمهورية." },
+        { id: 14, tab: "العلاقات الثنائية", date: "2026-03-09", title: "المشاورات السياسية التونسية الكينية", country: "كينيا", category: "الإستحقاقات الثنائية", status: "progress", details: "مقترح عقد الدورة الأولى للمشاورات السياسية يوم 13 ماي 2026." },
+        { id: 15, tab: "المسائل القنصلية والإدارية", date: "2026-03-19", title: "متابعة وضعية المواطن التونسي علي الجلاصي", country: "كينيا", category: "المسائل القنصلية", status: "completed", details: "تم إسناد جواز مرور للمواطن التونسي ومتابعة وضعيته." }
+    ];
+
+    let currentLanguage = 'fr';
+    let currentFilter = { search: '', country: '', status: '' };
+    let currentSort = { column: 'date', direction: 'asc' };
+
+    // Traductions
+    const translations = {
+        fr: {
+            appTitle: '📋 Dashboard Diplomatique',
+            appSubtitle: 'Ambassade de Tunisie - Suivi des activités',
+            total: 'Total activités',
+            completed: 'Terminées',
+            progress: 'En cours',
+            pending: 'En attente'
+        },
+        en: {
+            appTitle: '📋 Diplomatic Dashboard',
+            appSubtitle: 'Embassy of Tunisia - Activity Tracking',
+            total: 'Total Activities',
+            completed: 'Completed',
+            progress: 'In Progress',
+            pending: 'Pending'
+        },
+        ar: {
+            appTitle: '📋 لوحة القيادة الدبلوماسية',
+            appSubtitle: 'سفارة تونس - متابعة الأنشطة',
+            total: 'إجمالي الأنشطة',
+            completed: 'منجزة',
+            progress: 'قيد الإنجاز',
+            pending: 'قيد الانتظار'
+        }
+    };
+
+    function setLanguage(lang) {
+        currentLanguage = lang;
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.textContent.includes(lang === 'ar' ? 'العربية' : lang === 'en' ? 'English' : 'Français')) {
+                btn.classList.add('active');
+            }
+        });
+        
+        document.getElementById('appTitle').textContent = translations[lang].appTitle;
+        document.getElementById('appSubtitle').textContent = translations[lang].appSubtitle;
+        
+        renderTabs();
+        renderStats();
+        renderTable();
+    }
+
+    function renderTabs() {
+        const tabs = [...new Set(demoActivities.map(a => a.tab))];
+        const container = document.getElementById('tabsContainer');
+        container.innerHTML = '';
+        
+        // Ajouter bouton "Tous"
+        const allBtn = document.createElement('button');
+        allBtn.className = tab-btn ${!currentFilter.tab ? 'active' : ''};
+        allBtn.textContent = currentLanguage === 'fr' ? '📋 Tous les onglets' : currentLanguage === 'en' ? '📋 All tabs' : '📋 جميع الأقسام';
+        allBtn.onclick = () => { currentFilter.tab = null; renderTabs(); renderStats(); renderTable(); };
+        container.appendChild(allBtn);
+        
+        tabs.forEach(tab => {
+            const btn = document.createElement('button');
+            btn.className = tab-btn ${currentFilter.tab === tab ? 'active' : ''};
+            btn.textContent = tab;
+            btn.onclick = () => { currentFilter.tab = tab; renderTabs(); renderStats(); renderTable(); };
+            container.appendChild(btn);
+        });
+    }
+
+    function renderStats() {
+        let filtered = getFilteredData();
+        let total = filtered.length;
+        let completed = filtered.filter(a => a.status === 'completed').length;
+        let progress = filtered.filter(a => a.status === 'progress').length;
+        let pending = filtered.filter(a => a.status === 'pending').length;
+        
+        const t = translations[currentLanguage];
+        document.getElementById('statsContainer').innerHTML = `
+            <div class="stat-card" onclick="filterByStatus('all')">
+                <h3>${t.total}</h3>
+                <div class="number">${total}</div>
+            </div>
+            <div class="stat-card" onclick="filterByStatus('completed')">
+                <h3>✅ ${t.completed}</h3>
+                <div class="number">${completed}</div>
+            </div>
+            <div class="stat-card" onclick="filterByStatus('progress')">
+                <h3>🔄 ${t.progress}</h3>
+                <div class="number">${progress}</div>
+            </div>
+            <div class="stat-card" onclick="filterByStatus('pending')">
+                <h3>⏳ ${t.pending}</h3>
+                <div class="number">${pending}</div>
+            </div>
+        `;
+    }
+
+    function getFilteredData() {
+        let filtered = demoActivities;
+        
+        if (currentFilter.tab) {
+            filtered = filtered.filter(a => a.tab === currentFilter.tab);
+        }
+        
+        if (currentFilter.search) {
+            filtered = filtered.filter(a => 
+                a.title.toLowerCase().includes(currentFilter.search) ||
+                a.details.toLowerCase().includes(currentFilter.search) ||
+                a.country.toLowerCase().includes(currentFilter.search)
+            );
+        }
+        
+        if (currentFilter.country) {
+            filtered = filtered.filter(a => a.country === currentFilter.country);
+        }
+        
+        if (currentFilter.status && currentFilter.status !== 'all') {
+            filtered = filtered.filter(a => a.status === currentFilter.status);
+        }
+        
+        // Sort
+        filtered.sort((a, b) => {
+            let valA = a[currentSort.column];
+            let valB = b[currentSort.column];
+            if (currentSort.column === 'date') {
+                valA = new Date(valA);
+                valB = new Date(valB);
+            }
+            if (valA < valB) return currentSort.direction === 'asc' ? -1 : 1;
+            if (valA > valB) return currentSort.direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+        
+        return filtered;
+    }
+
+    function filterData() {
+        currentFilter.search = document.getElementById('searchInput').value.toLowerCase();
+        currentFilter.country = document.getElementById('countryFilter').value;
+        let statusVal = document.getElementById('statusFilter').value;
+        currentFilter.status = statusVal === '' ? null : statusVal;
+        
+        renderStats();
+        renderTable();
+    }
+
+    function filterByStatus(status) {
+        document.getElementById('statusFilter').value = status === 'all' ? '' : status;
+        filterData();
+    }
+
+    function sortTable(column) {
+        if (currentSort.column === column) {
+            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+        } else {
+            currentSort.column = column;
+            currentSort.direction = 'asc';
+        }
+        renderTable();
+    }
+
+    function renderTable() {
+        const filtered = getFilteredData();
+        
+        // Update country filter options
+        const allCountries = [...new Set(demoActivities.map(a => a.country))];
+        const countrySelect = document.getElementById('countryFilter');
+        const currentCountry = countrySelect.value;
+        countrySelect.innerHTML = '<option value="">🌍 Tous les pays</option>';
+        allCountries.forEach(c => {
+            countrySelect.innerHTML += <option value="${c}">${c}</option>;
+        });
+        countrySelect.value = currentCountry;
+        
+        // Render table
+        const thead = document.getElementById('tableHeader');
+        const tbody = document.getElementById('tableBody');
+        
+        thead.innerHTML = `
+            <tr>
+                <th onclick="sortTable('date')">📅 Date ${currentSort.column === 'date' ? (currentSort.direction === 'asc' ? '↑' : '↓') : ''}</th>
+                <th onclick="sortTable('title')">📌 Activité ${currentSort.column === 'title' ? (currentSort.direction === 'asc' ? '↑' : '↓') : ''}</th>
+                <th onclick="sortTable('country')">🌍 Pays ${currentSort.column === 'country' ? (currentSort.direction === 'asc' ? '↑' : '↓') : ''}</th>
+                <th>📊 Statut</th>
+                <th>🔍 Détails</th>
+            </tr>
+        `;
+        
+        tbody.innerHTML = filtered.map(activity => {
+            let statusText = '';
+            let statusClass = '';
+            if (activity.status === 'completed') {
+                statusText = currentLanguage === 'fr' ? '✅ Terminé' : currentLanguage === 'en' ? '✅ Completed' : '✅ منجز';
+                statusClass = 'status-completed';
+            } else if (activity.status === 'progress') {
+                statusText = currentLanguage === 'fr' ? '🔄 En cours' : currentLanguage === 'en' ? '🔄 In Progress' : '🔄 قيد الإنجاز';
+                statusClass = 'status-progress';
+            } else {
+                statusText = currentLanguage === 'fr' ? '⏳ En attente' : currentLanguage === 'en' ? '⏳ Pending' : '⏳ قيد الانتظار';
+                statusClass = 'status-pending';
+            }
+            
+            return `
+                <tr style="cursor: pointer;" onclick="showDetails(${activity.id})">
+                    <td>${activity.date}${activity.dateEnd ? ` → ${activity.dateEnd}` : ''}</td>
+                    <td><strong>${activity.title}</strong><br><small style="color:#666">${activity.category || ''}</small></td>
+                    <td>${activity.country}</td>
+                    <td><span class="status ${statusClass}">${statusText}</span></td>
+                    <td>${activity.details.substring(0, 80)}...</td>
+                </tr>
+            `;
+        }).join('');
+        
+        if (filtered.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:2rem;">📭 Aucune activité trouvée</td></tr>';
+        }
+    }
+
+    function showDetails(id) {
+        const activity = demoActivities.find(a => a.id === id);
+        if (!activity) return;
+        
+        let statusText = '';
+        if (activity.status === 'completed') statusText = '✅ Terminé';
+        else if (activity.status === 'progress') statusText = '🔄 En cours';
+        else statusText = '⏳ En attente';
+        
+        document.getElementById('modalTitle').textContent = activity.title;
+        document.getElementById('modalBody').innerHTML = `
+            <p><strong>📅 Date:</strong> ${activity.date}${activity.dateEnd ? ` → ${activity.dateEnd}` : ''}</p>
+            <p><strong>🌍 Pays:</strong> ${activity.country}</p>
+            <p><strong>📂 Catégorie:</strong> ${activity.category || '-'}</p>
+            <p><strong>📊 Statut:</strong> ${statusText}</p>
+            <p><strong>📋 Détails complets:</strong></p>
+            <p style="background:#f5f5f5; padding:1rem; border-radius:8px;">${activity.details}</p>
+            <p><strong>📁 Source:</strong> ${activity.tab}</p>
+        `;
+        document.getElementById('detailModal').classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('detailModal').classList.remove('active');
+    }
+
+    // Initialize
+    setLanguage('fr');
+</script>
+
+</body>
+</html>
